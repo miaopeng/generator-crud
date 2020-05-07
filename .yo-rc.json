@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Peng Miao",
+      "authorEmail": "mios426@gmail.com",
+      "authorUrl": "http://div.life"
+    }
+  }
+}
