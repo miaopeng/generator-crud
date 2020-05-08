@@ -1,9 +1,9 @@
 import { request } from '@/utils/apollo';
 import {
-  <% if (gql.list) { %><%= gql.list.operation %>, <% } %>
-  <% if (gql.read) { %> <%= gql.read.operation %>, <% } %>
-  <% if (gql.create) { %> <%= gql.create.operation %>, <% } %>
-  <% if (gql.update) { %> <%= gql.update.operation %>, <% } %>
+  <%= gql.list && gql.list.operation + ',' %>
+  <%= gql.read && gql.read.operation + ',' %>
+  <%= gql.create && gql.create.operation + ',' %>
+  <%= gql.update && gql.update.operation + ',' %>
 } from './<%= sourceFile %>';
 
 <% if (gql.list) { %>

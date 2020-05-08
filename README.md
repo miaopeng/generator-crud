@@ -1,36 +1,22 @@
-# generator-crud [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> CRUD pages generator
+# Generator CRUD
 
-## Installation
+A generator for Graphql + Apollo + React
 
-First, install [Yeoman](http://yeoman.io) and generator-crud using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+## 生成 CRUD 代码
 
-```bash
-npm install -g yo
-npm install -g generator-crud
+在当前目录下，根据已有的 graphql 文件， 生成 CRUD 代码
+```
+$ yo crud
 ```
 
-Then generate your new project:
+## 安装相关的依赖及文件
 
-```bash
-yo crud
+```
+$ yo crud:init
 ```
 
-## Getting To Know Yeoman
+## 在当前目录生成一个 graphql 例子文件
 
- * Yeoman has a heart of gold.
- * Yeoman is a person with feelings and opinions, but is very easy to work with.
- * Yeoman can be too opinionated at times but is easily convinced not to be.
- * Feel free to [learn more about Yeoman](http://yeoman.io/).
-
-## License
-
-MIT © [Peng Miao](http://div.life)
-
-
-[npm-image]: https://badge.fury.io/js/generator-crud.svg
-[npm-url]: https://npmjs.org/package/generator-crud
-[travis-image]: https://travis-ci.com/miaopeng/generator-crud.svg?branch=master
-[travis-url]: https://travis-ci.com/miaopeng/generator-crud
-[daviddm-image]: https://david-dm.org/miaopeng/generator-crud.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/miaopeng/generator-crud
+```
+$ yo crud:graphql
+```

@@ -2,13 +2,10 @@
 const fs = require("fs");
 const Generator = require("yeoman-generator");
 const chalk = require("chalk");
+const prettier = require("gulp-prettier");
 const { gql } = require("../../utils/utils");
 
 module.exports = class extends Generator {
-  initializing() {
-    // This.sourceRoot(path.resolve(this.templatePath(), "../app/templates"));
-  }
-
   async prompting() {
     this.log(`${chalk.green("Welcome to the graphql crud generator!")}`);
     this.log(`
@@ -67,8 +64,6 @@ update: 更新操作 e.g. updateFilm
 
         const operations = gql.getOpertionsFromFile(file);
 
-        this.log("ops count", Object.keys(operations).length);
-
         if (!Object.keys(operations).length) {
           this.log(`${chalk.red(`在 ${file} 文件中找不到 operation!`)}`);
           process.exit(1);
@@ -85,35 +80,31 @@ update: 更新操作 e.g. updateFilm
 
   writing() {
     const { sourceFile, pageName, operations } = this.props;
-    // This.log("tpl", this.templatePath());
 
-    if (operations) {
-      const data = {
-        sourceFile,
-        gql: {
-          ...gql.getTypes(pageName),
-          ...operations
-        }
-      };
-      this.log(data);
+    const data = {
+      sourceFile,
+      gql: {
+        ...gql.getTypes(pageName),
+        ...operations
+      }
+    };
 
+    this.log(data);
+
+    this.registerTransformStream(prettier());
+
+    this.fs.copyTpl(
+      this.templatePath("react/page/@(index|service).js"),
+      this.destinationPath(),
+      data
+    );
+
+    if (operations.create || operations.update) {
       this.fs.copyTpl(
-        this.templatePath("react/page/*"),
-        this.destinationPath(),
+        this.templatePath("react/page/form.js"),
+        this.destinationPath("form.js"),
         data
       );
-    } else {
-      this.log(`${chalk.red("在 graphql 文件中找不到 operation!")}`);
     }
-    // This.log("this.props", JSON.stringify(this.props, null, 2));
-    // this.fs.copyTpl(
-    //   this.templatePath("react/page/*"),
-    //   this.destinationPath(this.props.pageName),
-    //   this.props
-    // );
-    // this.fs.copy(
-    //   this.templatePath("react/utils/*"),
-    //   this.destinationPath("utils")
-    // );
   }
 };

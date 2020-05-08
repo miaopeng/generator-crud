@@ -28,11 +28,15 @@ function getQueryFacts(schema, documentStr) {
 
   const buildOperation = node => {
     const query = getFirstField(node);
-    const fields = getFields(query, { described: true });
+    const describedFields = getFields(query, { described: true });
+    const fields = describedFields.length ? describedFields : getFields(query);
     return {
       operation: node.name.value,
       query: query && query.name.value,
-      fields: fields.map(f => ({ name: f.name.value, title: getDesc(f) }))
+      fields: fields.map(f => ({
+        name: f.name.value,
+        title: getDesc(f) || f.name.value
+      }))
     };
   };
 

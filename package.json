@@ -1,6 +1,6 @@
 {
   "name": "generator-crud",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "CRUD pages generator",
   "homepage": "",
   "author": {
@@ -13,7 +13,11 @@
   ],
   "main": "generators/index.js",
   "keywords": [
-    "generator yo crud",
+    "graphql",
+    "react",
+    "CRUD",
+    "generator",
+    "yeoman",
     "yeoman-generator"
   ],
   "devDependencies": {
@@ -34,9 +38,9 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "graphql": "^15.0.0",
+    "gulp-prettier": "^3.0.0",
     "pluralize": "^8.0.0",
-    "yeoman-generator": "^2.0.1",
-    "yosay": "^2.0.1"
+    "yeoman-generator": "^2.0.1"
   },
   "jest": {
     "testEnvironment": "node"

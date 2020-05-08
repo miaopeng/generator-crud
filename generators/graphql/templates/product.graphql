@@ -1,0 +1,35 @@
+query listProducts {
+  products {
+    id
+    # 产品名称
+    title
+    # 描述
+    description
+  }
+}
+
+mutation createProduct($input: ProductInput!) {
+  productCreate(input: $input) {
+    product {
+      id
+      title
+      description
+    }
+    errors {
+      fullMessages
+    }
+  }
+}
+
+mutation updateProduct($input: ProductInput!) {
+  productUpdate(input: $input) {
+    product {
+      id
+      title
+      description
+    }
+    errors {
+      fullMessages
+    }
+  }
+}
