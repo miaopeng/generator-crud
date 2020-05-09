@@ -8,10 +8,10 @@ const <%= gql.Type %>List = () => {
   const [loading, setLoading] = useState(true);
   const [<%= gql.types %>, set<%= gql.Types %>] = useState([]);
   <% if (gql.create) { %>const [modalVisible, setModalVisible] = useState(false); <% } %>
-  <% if (gql.update) { %>
+  <% if (gql.update) { -%>
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [record, setRecord] = useState({});
-  <% } %>
+  <% } -%>
 
   const list = async () => {
     setLoading(true);
@@ -22,6 +22,11 @@ const <%= gql.Type %>List = () => {
       set<%= gql.Types %>(data.<%= gql.types %>);
     }
   };
+
+  const openEdit = (data) => {
+     setRecord(data);
+     setEditModalVisible(true);
+  }
 
   const columns = [
   <% for (const field of gql.list.fields) { %>
@@ -37,13 +42,9 @@ const <%= gql.Type %>List = () => {
     align: 'right',
     render: (text, data) => {
       return (
-        <Button type="link" onClick={()=> {
-          setRecord(data);
-          setEditModalVisible(true);
-          }}
-          >
-          <Edit />
-        </Button>
+        <a className="mr1" title="编辑" onClick={() => openEdit(data)}>
+          <Edit className="icon"/> 编辑
+        </a>
       );
     },
   },
@@ -57,15 +58,16 @@ useEffect(() => {
 <% if (gql.create) { %>
 const add = async (values) => {
   setLoading(true);
-  const { data, errors } = await createMutation(values);
-  setLoading(false);
+  const { errors } = await createMutation(values);
 
-  if (!errors && data) {
+  if (!errors) {
     message.success('Add <%= gql.Type %> successfully');
     setModalVisible(false);
+    setLoading(false);
     return Promise.resolve();
   }
   message.error('Add <%= gql.Type %> failed!');
+  setLoading(false);
   return Promise.reject();
 };
 
@@ -78,28 +80,26 @@ const onFinish = async (values) => {
 <% if (gql.update) { %>
 const update = async (values) => {
   setLoading(true);
-  const { data, errors } = await updateMutation(values);
-  setLoading(false);
+  const { errors } = await updateMutation(values);
 
-  if (!errors && data) {
+  if (!errors) {
     message.success('update <%= gql.Type %> successfully');
     setEditModalVisible(false);
+    setLoading(false);
     return Promise.resolve();
   }
   message.error('update <%= gql.Type %> failed!');
+  setLoading(false);
   return Promise.reject();
 };
+
 const onEditFinish = async (values) => {
   await update({ ...values, id: record.id });
   list();
 };
 <% } %>
 
-const routes = [{
-  breadcrumbName: '<%= gql.Type %>',
-},{
-  breadcrumbName: 'list',
-}];
+const routes = [{path: '/<%= gql.types %>', breadcrumbName: '<%= gql.Type %>' } ];
 
 return (
 <>
@@ -110,7 +110,6 @@ return (
   <Table rowKey="id"
     columns={columns}
     dataSource={<%= gql.types %>}
-    size="small"
     pagination={false}
     loading={loading} />
   <% if (gql.create) { %>

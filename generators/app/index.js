@@ -45,12 +45,9 @@ update: 更新操作 e.g. updateFilm
       return;
     }
 
-    if (sourceFiles.length === 1) {
-      this.props = {
-        sourceFile: sourceFiles[0],
-        pageName: sourceFiles[0].replace(".graphql", "")
-      };
-    } else {
+    let sourceFile = sourceFiles[0];
+
+    if (sourceFiles.length > 1) {
       const prompts = [
         {
           type: "list",
@@ -59,23 +56,24 @@ update: 更新操作 e.g. updateFilm
           message: "使用哪个文件作为源文件？"
         }
       ];
-      return this.prompt(prompts).then(props => {
-        const { file } = props;
-
-        const operations = gql.getOpertionsFromFile(file);
-
-        if (!Object.keys(operations).length) {
-          this.log(`${chalk.red(`在 ${file} 文件中找不到 operation!`)}`);
-          process.exit(1);
-        }
-
-        this.props = {
-          sourceFile: file,
-          pageName: file.replace(".graphql", ""),
-          operations
-        };
-      });
+      const answers = await this.prompt(prompts);
+      sourceFile = answers.file;
     }
+
+    this.log("sourceFile: ", sourceFile);
+
+    const operations = gql.getOpertionsFromFile(sourceFile);
+
+    if (!operations || !Object.keys(operations).length) {
+      this.log(`${chalk.red(`在 ${sourceFile} 文件中找不到 operation!`)}`);
+      process.exit(1);
+    }
+
+    this.props = {
+      sourceFile,
+      pageName: sourceFile.replace(".graphql", ""),
+      operations
+    };
   }
 
   writing() {

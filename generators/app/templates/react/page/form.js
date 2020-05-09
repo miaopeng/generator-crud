@@ -2,11 +2,11 @@ import React from 'react';
 import { Form, Input, Button } from 'antd';
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 6 },
+  wrapperCol: { span: 12 },
 };
 const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
+  wrapperCol: { offset: 6, span: 12 },
 };
 
 const <%= gql.Type %>Form = (props) => {
@@ -17,7 +17,7 @@ const <%= gql.Type %>Form = (props) => {
       <Form.Item
         label="<%= field.title%>"
         name="<%= field.name%>"
-        rules={[{ required: true, message: 'Please input <%= gql.type%> <%= field.title%>!' }]}
+        rules={[{ required: true, message: '请输入<%= field.title%>!' }]}
       >
         <Input />
       </Form.Item>
