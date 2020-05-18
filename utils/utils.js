@@ -25,6 +25,7 @@ function getQueryFacts(schema, documentStr) {
   //   : undefined;
   // Collect operations by their names.
   const operations = {};
+  const fragments = {};
 
   const buildOperation = node => {
     const query = getFirstField(node);
@@ -40,22 +41,64 @@ function getQueryFacts(schema, documentStr) {
     };
   };
 
+  const getFields = (node = {}, opt = {}) => {
+    const { selectionSet } = node;
+    const { described = false } = opt;
+    if (!selectionSet || !selectionSet.selections) {
+      return [];
+    }
+
+    let fields = [];
+
+    selectionSet.selections.forEach(selection => {
+      if (selection.kind === "Field") {
+        fields.push(selection);
+        return;
+      }
+
+      if (selection.kind === "FragmentSpread") {
+        const fragment = fragments[selection.name.value];
+        if (!fragment) {
+          throw new Error(`Can not found fragment ${selection.name.value}`);
+        }
+
+        fields = fields.concat(getChildFields(fragment));
+      }
+    });
+
+    if (!described) {
+      return fields;
+    }
+
+    return fields.filter(f => Boolean(getDesc(f)));
+  };
+
+  documentAST.definitions.forEach(def => {
+    if (def.kind === "FragmentDefinition") {
+      fragments[def.name.value] = def;
+    }
+  });
+
   documentAST.definitions.forEach(def => {
     if (def.kind === "OperationDefinition") {
-      if (!operations.list && def.name.value.startsWith("list")) {
+      if (!operations.list && def.name.value.endsWith("List")) {
         operations.list = buildOperation(def);
       }
 
-      if (!operations.read && def.name.value.startsWith("read")) {
+      if (!operations.read && def.name.value.endsWith("Read")) {
         operations.read = buildOperation(def);
       }
 
-      if (!operations.create && def.name.value.startsWith("create")) {
+      if (!operations.create && def.name.value.endsWith("Create")) {
         operations.create = buildOperation(def);
       }
 
-      if (!operations.update && def.name.value.startsWith("update")) {
+      if (!operations.update && def.name.value.endsWith("Update")) {
         operations.update = buildOperation(def);
+      }
+
+      if (!operations.delete && def.name.value.endsWith("Delete")) {
+        operations.delete = buildOperation(def);
       }
     }
   });
@@ -92,19 +135,13 @@ function getFirstField(node = {}) {
   return selectionSet.selections.find(f => f.kind === "Field");
 }
 
-function getFields(node = {}, opt = {}) {
+function getChildFields(node = {}) {
   const { selectionSet } = node;
-  const { described = false } = opt;
   if (!selectionSet || !selectionSet.selections) {
     return [];
   }
 
-  const fields = selectionSet.selections.filter(f => f.kind === "Field");
-  if (!described) {
-    return fields;
-  }
-
-  return fields.filter(f => Boolean(getDesc(f)));
+  return selectionSet.selections.filter(f => f.kind === "Field");
 }
 
 function getDesc(node = {}) {
@@ -157,7 +194,6 @@ const gql = {
 module.exports = {
   gql,
   getDesc,
-  getFields,
   getFirstField,
   getQueryFacts
 };

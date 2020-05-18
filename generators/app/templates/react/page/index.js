@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Table, <% if (gql.create || gql.update) { %>Button, Modal, message<% } %> } from 'antd';
+import { Breadcrumb, Table, <% if (gql.create || gql.update) { %>Button, Modal, message<% } %><%= gql.delete && ', Popconfirm' %> } from 'antd';
 <% if (gql.update) { %>import { Edit } from 'react-feather'; <% } %>
-import { listQuery<%= gql.create && ', createMutation'%><%= gql.update && ', updateMutation' %> } from './service';
+import { listQuery<%= gql.create && ', createMutation'%><%= gql.update && ', updateMutation' %><%= gql.delete && ', deleteMutation' %>} from './service';
 <% if (gql.create || gql.update) { %> import <%= gql.Type %>Form from './form'; <% } %>
 
 const <%= gql.Type %>List = () => {
@@ -28,7 +28,27 @@ const <%= gql.Type %>List = () => {
      setEditModalVisible(true);
   }
 
-  const columns = [
+  <% if (gql.delete) { %>
+  const deleteAction = async (id) => {
+    setLoading(true);
+    const { errors } = await deleteMutation(id);
+    setLoading(false);
+
+    if (!errors) {
+      message.success('Delete Enterprise successfully');
+      return Promise.resolve();
+    }
+    message.error('Delete Enterprise failed!');
+    return Promise.reject();
+  };
+
+  const onDelete = async (id) => {
+    await deleteAction(id);
+    list();
+  };
+<% } %>
+
+const columns = [
   <% for (const field of gql.list.fields) { %>
   {
     title: '<%= field.title %>',
@@ -36,15 +56,22 @@ const <%= gql.Type %>List = () => {
     width: 150,
   },
   <% } %>
-  <% if (gql.update) { %>
+  <% if (gql.update || gql.delete) { %>
   {
     title: 'Actions',
     align: 'right',
     render: (text, data) => {
       return (
-        <a className="mr1" title="编辑" onClick={() => openEdit(data)}>
-          <Edit className="icon"/> 编辑
-        </a>
+        <>
+          <a className="mr1" title="编辑" onClick={() => openEdit(data)}>
+            <Edit className="icon"/> 编辑
+          </a>
+          <Popconfirm title="您确认要删除此企业吗？" onConfirm={() => onDelete(data.id)}>
+            <a className="mr1" title="删除">
+              <Trash className="icon" /> 删除
+            </a>
+          </Popconfirm>
+        </>
       );
     },
   },

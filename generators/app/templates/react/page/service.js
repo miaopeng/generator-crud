@@ -4,6 +4,7 @@ import {
   <%= gql.read && gql.read.operation + ',' %>
   <%= gql.create && gql.create.operation + ',' %>
   <%= gql.update && gql.update.operation + ',' %>
+  <%= gql.delete && gql.delete.operation + ',' %>
 } from './<%= sourceFile %>';
 
 <% if (gql.list) { %>
@@ -27,5 +28,11 @@ export async function createMutation(input) {
 <% if (gql.update) { %>
 export async function updateMutation(input) {
   return request({ type: 'mutate', mutation: <%= gql.update.operation %>, variables: { input } });
+}
+<% } %>
+
+<% if (gql.delete) { %>
+export async function deleteMutation(input) {
+  return request({ type: 'mutate', mutation: <%= gql.delete.operation %>, variables: { input } });
 }
 <% } %>

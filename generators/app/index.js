@@ -10,12 +10,13 @@ module.exports = class extends Generator {
     this.log(`${chalk.green("Welcome to the graphql crud generator!")}`);
     this.log(`
 ${chalk.green("本工具将会使用当前目录下的一个 graphql 文件来生成 crud 代码")}
-您的 graphql 文件需要包含若干个 operation, 我们用几个前缀来识别您的 operation:
+您的 graphql 文件需要包含若干个 operation, 我们用几个后缀来识别您的 operation:
 
-list: 列表操作 e.g. listFilms
-read: 详情操作 e.g. readFilm
-create: 新增操作 e.g. createFilm
-update: 更新操作 e.g. updateFilm
+list: 列表操作 e.g. FilmList
+read: 详情操作 e.g. FilmRead
+create: 新增操作 e.g. FilmCreate
+update: 更新操作 e.g. FilmUpdate
+delete: 删除操作 e.g. FilmDelete
 `);
 
     const hello = await this.prompt({
@@ -87,7 +88,7 @@ update: 更新操作 e.g. updateFilm
       }
     };
 
-    this.log(data);
+    this.log(JSON.stringify(data, null, 2));
 
     this.registerTransformStream(prettier());
 
