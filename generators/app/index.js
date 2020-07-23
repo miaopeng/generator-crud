@@ -98,6 +98,14 @@ delete: 删除操作 e.g. FilmDelete
       data
     );
 
+    if (operations.read) {
+      this.fs.copyTpl(
+        this.templatePath("react/page/detail.js"),
+        this.destinationPath("detail.js"),
+        data
+      );
+    }
+
     if (operations.create || operations.update) {
       this.fs.copyTpl(
         this.templatePath("react/page/form.js"),

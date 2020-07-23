@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Table, <% if (gql.create || gql.update) { %>Button, Modal, message<% } %><%= gql.delete && ', Popconfirm' %> } from 'antd';
-<% if (gql.update) { %>import { Edit } from 'react-feather'; <% } %>
-import { listQuery<%= gql.create && ', createMutation'%><%= gql.update && ', updateMutation' %><%= gql.delete && ', deleteMutation' %>} from './service';
+import {
+  Breadcrumb,
+  Table,
+  <%= gql.create &&  'Button,' %>
+  <%= (gql.create || gql.update) && 'Modal, message,' %>
+  <%= gql.delete && 'Popconfirm,' %>
+} from 'antd';
+<% if (gql.update || gql.delete) { %>import {
+  <%= gql.update &&  'Edit,' %>
+  <%= gql.read &&  'ChevronRight,' %>
+  <%= gql.delete &&  'Trash,' %>
+} from 'react-feather'; <% } %>
+<% if (gql.read) { %>import { Link } from 'umi';<% } %>
+import {
+  listQuery<%= gql.create && ', createMutation' %>
+  <%= gql.update && ', updateMutation' %>
+  <%= gql.delete && ', deleteMutation' %>
+} from './service';
 <% if (gql.create || gql.update) { %> import <%= gql.Type %>Form from './form'; <% } %>
 
 const <%= gql.Type %>List = () => {
@@ -23,10 +38,32 @@ const <%= gql.Type %>List = () => {
     }
   };
 
+  <% if (gql.update) { %>
+  const update = async (values) => {
+    setLoading(true);
+    const { errors } = await updateMutation(values);
+
+    if (!errors) {
+      message.success('update <%= gql.Type %> successfully');
+      setEditModalVisible(false);
+      setLoading(false);
+      return Promise.resolve();
+    }
+    message.error('update <%= gql.Type %> failed!');
+    setLoading(false);
+    return Promise.reject();
+  };
+
   const openEdit = (data) => {
-     setRecord(data);
-     setEditModalVisible(true);
+    setRecord(data);
+    setEditModalVisible(true);
   }
+
+  const onEditFinish = async (values) => {
+    await update({ ...values, id: record.id });
+    list();
+  };
+  <% } %>
 
   <% if (gql.delete) { %>
   const deleteAction = async (id) => {
@@ -56,6 +93,12 @@ const columns = [
     width: 150,
   },
   <% } %>
+  <% if (gql.read) { %>
+  {
+    title: '',
+    render: (text, { id }) => <Link to={`/<%= gql.types%>/${id}`}>详情<ChevronRight className="iconmate"/></Link>,
+  },
+  <% } %>
   <% if (gql.update || gql.delete) { %>
   {
     title: 'Actions',
@@ -64,11 +107,11 @@ const columns = [
       return (
         <>
           <a className="mr1" title="编辑" onClick={() => openEdit(data)}>
-            <Edit className="icon"/> 编辑
+            <Edit className="iconmate"/> 编辑
           </a>
-          <Popconfirm title="您确认要删除此企业吗？" onConfirm={() => onDelete(data.id)}>
+          <Popconfirm title="您确认要删除此项吗？" onConfirm={() => onDelete(data.id)}>
             <a className="mr1" title="删除">
-              <Trash className="icon" /> 删除
+              <Trash className="iconmate" /> 删除
             </a>
           </Popconfirm>
         </>
@@ -104,27 +147,6 @@ const onFinish = async (values) => {
 };
 <% } %>
 
-<% if (gql.update) { %>
-const update = async (values) => {
-  setLoading(true);
-  const { errors } = await updateMutation(values);
-
-  if (!errors) {
-    message.success('update <%= gql.Type %> successfully');
-    setEditModalVisible(false);
-    setLoading(false);
-    return Promise.resolve();
-  }
-  message.error('update <%= gql.Type %> failed!');
-  setLoading(false);
-  return Promise.reject();
-};
-
-const onEditFinish = async (values) => {
-  await update({ ...values, id: record.id });
-  list();
-};
-<% } %>
 
 const routes = [{path: '/<%= gql.types %>', breadcrumbName: '<%= gql.Type %>' } ];
 
